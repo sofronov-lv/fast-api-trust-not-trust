@@ -1,9 +1,13 @@
 from fastapi import APIRouter
 
-user_router = APIRouter(prefix="/api/user", tags=["Adding a user"])
+router = APIRouter(prefix="/api/user", tags=["Adding a user"])
 
 
-@user_router.get("/registration")
+@router.post("/registration")
 async def registration():
     pass
 
+
+@router.post("/add")
+async def add_user():
+    pass

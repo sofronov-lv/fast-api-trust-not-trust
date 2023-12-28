@@ -1,8 +1,13 @@
 from fastapi import APIRouter
 
-user_router = APIRouter(prefix="/api/code", tags=["Code"])
+router = APIRouter(prefix="/api/code", tags=["Code"])
 
 
-@user_router.get("/")
-async def registration():
+@router.get("/")
+async def get_code():
+    pass
+
+
+@router.post("/")
+async def post_code():
     pass
