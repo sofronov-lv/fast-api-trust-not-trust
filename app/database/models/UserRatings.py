@@ -3,8 +3,8 @@ import datetime
 
 from peewee import *
 
-from app.database.models.BaseModel import BaseModel
-from app.database.models.Users import User
+from app.database.models.Base import BaseModel
+from app.database.models.User import User
 
 
 class UserRating(BaseModel):

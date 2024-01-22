@@ -1,3 +1,9 @@
-from peewee import *
+from pydantic_settings import BaseSettings
 
-db = PostgresqlDatabase(database="trust_not_trust", user="postgres", password="2804", host="127.0.0.1", port=5434)
+
+class Setting(BaseSettings):
+    db_url: str = "postgresql+asyncpg://postgres:2804@localhost:5432/asyncalchemy"
+    db_echo: bool = False  # TODO: False
+
+
+setting = Setting()

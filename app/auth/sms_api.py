@@ -8,7 +8,7 @@ class SMS:
     URL = f"https://json.gate.iqsms.ru/send/"
 
     @staticmethod
-    def send_sms(phone_number: str, code: str, id_="0"):
+    def send_sms(phone_number: str, code: str, id_: int):
         """Sending sms packet"""
         message = {
             "clientId": str(id_),
@@ -24,8 +24,8 @@ class SMS:
             "password": IQ_SMS_PASSWORD
         }
         try:
-            response = requests.post(SMS.URL, data=json.dumps(params), verify=False).text
-            return True if response else False
+            response = requests.post(SMS.URL, data=json.dumps(params), verify=False)
+            return True if response.text else False
 
         except Exception:
             return False
