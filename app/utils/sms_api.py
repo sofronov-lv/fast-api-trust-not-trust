@@ -1,7 +1,7 @@
 import json
 import requests
 
-from app.configs.config import IQ_SMS_LOGIN, IQ_SMS_PASSWORD
+from app.core.config import IQ_SMS_LOGIN, IQ_SMS_PASSWORD
 
 
 class SMS:
