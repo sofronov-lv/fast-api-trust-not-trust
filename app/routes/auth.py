@@ -130,7 +130,7 @@ async def registration(
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
     await utils.convert_params_user(user_update)
-    return user_service.update_user(session, auth, user_update, is_registration=True)
+    return await user_service.update_user(session, auth, user_update, is_registration=True)
 
 
 @router.post("/refresh-token", response_model=AccessToken)

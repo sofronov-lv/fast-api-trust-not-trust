@@ -21,7 +21,8 @@ class UserUpdatePartial(UserBase):
     patronymic: str | None = None
     birthdate: str | None = None
     country: str | None = None
-    city: str | None = None
+    # city: str | None = None
+    region: str | None = None
 
 
 class UserLogin(UserBase):
@@ -35,13 +36,26 @@ class UserRegistration(UserBase):
     patronymic: str | None = None
     birthdate: str | datetime.date
     country: str
-    city: str
+    # city: str
+    region: str
+
+
+class UsersLimit(UserBase):
+    offset: int = 0
+    limit: int = 10
 
 
 class UserContactList(UserBase):
     phone_numbers: list[str]
-    offset: int = 0
-    limit: int = 10
+
+
+class UserSearch(UserBase):
+    phone_number: str | None = None
+    surname: str | None = None
+    name: str | None = None
+    patronymic: str | None = None
+    birthdate: str | None = None
+    country: str | None = None
 
 
 class UserOut(UserBase):
@@ -54,9 +68,10 @@ class UserOut(UserBase):
     name: str | None
     patronymic: str | None = None
     fullname: str
-    birthdate: str | None
+    birthdate: str | datetime.date | None
     country: str | None
-    city: str | None
+    region: str | None
+    # city: str | None
     likes: int
     dislikes: int
     positive_scores: int
@@ -65,3 +80,10 @@ class UserOut(UserBase):
     is_active: bool
     is_verified: bool
     is_registered: bool
+
+
+class UserRatingOut(UserOut):
+    rating_id: int
+    date: datetime.datetime
+    feedback: bool
+    score: int

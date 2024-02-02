@@ -20,8 +20,13 @@ DB_PORT = os.getenv("DB_PORT")
 API_HOST = os.getenv("API_HOST")
 API_PORT = os.getenv("API_PORT")
 
-
 KEY_PATH = Path("../app/core/certs")
+
+BASE_LINK = "http://127.0.0.1:8000/api/user/avatar/"
+DEFAULT_LINK = BASE_LINK + "DEFAULT"
+
+BASE_PATH = "../app/images/avatars/"
+DEFAULT_PATH = "../app/images/DEFAULT.jpg"
 
 
 class DbSettings(BaseSettings):

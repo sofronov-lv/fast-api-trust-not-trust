@@ -105,3 +105,16 @@ async def checking_registered(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"The user already exists"
         )
+
+
+async def checking_user(
+        session: AsyncSession,
+        user_id: int
+):
+    if user := await user_service.get_user_by_id(session, user_id):
+        return user
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="User not found"
+    )
