@@ -36,17 +36,15 @@ async def get_code(
         code = await auth_service.update_code_all(session, otc, CodeUpdate(phone_number=phone_number))
 
     # TODO: replace with commented-out lines
-    print(code.code)
-    return JSONResponse(status_code=200, content={"message": "The code has been sent successfully"})
-    # if SMS.send_sms(phone_number, code.code, code.id):
-    #     return JSONResponse(
-    #         status_code=200,
-    #         content={"message": "The code has been sent successfully"}
-    #     )
-    # raise HTTPException(
-    #     status_code=status.HTTP_400_BAD_REQUEST,
-    #     detail="Failed to send sms"
-    # )
+    if SMS.send_sms(phone_number, code.code, code.id):
+        return JSONResponse(
+            status_code=200,
+            content={"message": "The code has been sent successfully"}
+        )
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Failed to send sms"
+    )
 
 
 async def validate_auth_user(
