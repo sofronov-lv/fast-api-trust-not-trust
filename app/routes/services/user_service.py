@@ -28,7 +28,7 @@ def get_fullname(surname: str, name: str, patronymic: str) -> str:
 
 def calc_rating(u: User):
     try:
-        rating = (5 * u.positive_scores - u.likes + u.negative_scores) / (u.positive_scores + u.negative_scores)
+        rating = 5 * u.positive_scores / (u.positive_scores + u.negative_scores)
         return round(rating, 1)
     except ZeroDivisionError:
         return 0.0
