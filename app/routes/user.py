@@ -45,7 +45,7 @@ async def get_user(
     return await utils.checking_user(session, user_id)
 
 
-@router.get("/profile", response_model=UserOut)
+@router.get("/profile/", response_model=UserOut)
 async def profile(
         auth: User = Depends(utils.get_current_active_auth_user)
 ):
