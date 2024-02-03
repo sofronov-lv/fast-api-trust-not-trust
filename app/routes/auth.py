@@ -15,7 +15,9 @@ from app.routes.services import auth_service
 from app.database.models import db_helper
 from app.database.models import User
 
-router = APIRouter(prefix="/api", tags=["Auth"], )
+from app.utils.sms_api import SMS
+
+router = APIRouter(prefix="/api", tags=["Auth"])
 
 
 @router.get("/code")
@@ -35,7 +37,6 @@ async def get_code(
     else:
         code = await auth_service.update_code_all(session, otc, CodeUpdate(phone_number=phone_number))
 
-    # TODO: replace with commented-out lines
     if SMS.send_sms(phone_number, code.code, code.id):
         return JSONResponse(
             status_code=200,
