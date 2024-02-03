@@ -87,7 +87,8 @@ def refresh_access_token(cred: HTTPAuthorizationCredentials = Depends(http_beare
 
 async def convert_params_user(user_update: UserUpdatePartial | UserRegistration):
     try:
-        user_update.birthdate = user_service.convert_str_to_date(user_update.birthdate)
+        if user_update.birthdate:
+            user_update.birthdate = user_service.convert_str_to_date(user_update.birthdate)
 
     except ValueError:
         raise HTTPException(
