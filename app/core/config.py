@@ -25,8 +25,8 @@ KEY_PATH = Path("app/core/certs")
 BASE_LINK = "https://185.178.46.6/api/user/avatar/"
 DEFAULT_LINK = BASE_LINK + "DEFAULT"
 
-BASE_PATH = "../app/images/avatars/"
-DEFAULT_PATH = "../app/images/DEFAULT.jpg"
+BASE_PATH = "app/images/avatars/"
+DEFAULT_PATH = "app/images/DEFAULT.jpg"
 
 
 class DbSettings(BaseSettings):
