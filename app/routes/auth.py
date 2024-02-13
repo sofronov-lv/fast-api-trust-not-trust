@@ -15,7 +15,7 @@ from app.routes.services import auth_service
 from app.database.models import db_helper
 from app.database.models import User
 
-from app.utils.sms_api import SMS
+from app.utils.sms_api import send_sms
 
 router = APIRouter(prefix="/api", tags=["Auth"])
 
@@ -37,7 +37,7 @@ async def get_code(
     else:
         code = await auth_service.update_code_all(session, otc, CodeUpdate(phone_number=phone_number))
 
-    if SMS.send_sms(phone_number, code.code, code.id):
+    if send_sms(phone_number, code.code, code.id):
         return JSONResponse(
             status_code=200,
             content={"message": "The code has been sent successfully"}
