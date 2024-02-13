@@ -33,14 +33,18 @@ async def get_code(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="You need to wait 1 minute before sending a new SMS message"
         )
-
     else:
         code = await auth_service.update_code_all(session, otc, CodeUpdate(phone_number=phone_number))
 
-    if send_sms(phone_number, code.code, code.id):
+    # if send_sms(phone_number, code.code, code.id):
+    #     return JSONResponse(
+    #         status_code=200,
+    #         content={"message": "The code has been sent successfully"}
+    #     )
+    if code:
         return JSONResponse(
             status_code=200,
-            content={"message": "The code has been sent successfully"}
+            content={"message": code.code}
         )
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
