@@ -22,7 +22,7 @@ API_PORT = os.getenv("API_PORT")
 
 KEY_PATH = Path("app/core/certs")
 
-BASE_LINK = "http://185.178.46.6:8000/api/user/avatar/"
+BASE_LINK = "https://185.178.46.6/api/user/avatar/"
 DEFAULT_LINK = BASE_LINK + "DEFAULT"
 
 BASE_PATH = "../app/images/avatars/"
