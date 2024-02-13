@@ -64,12 +64,16 @@ async def get_current_verified_user(
 
 
 def get_access_token(user_id: int):
-    access_token = jwt_token.encode_jwt_access(payload=jwt_token.generate_payload_access(user_id))
+    access_token = jwt_token.encode_jwt_access(
+        payload=jwt_token.generate_payload_access(user_id)
+    )
     return access_token
 
 
 def get_refresh_token(user_id: int):
-    refresh_token = jwt_token.encode_jwt_refresh(payload=jwt_token.generate_payload_refresh(user_id))
+    refresh_token = jwt_token.encode_jwt_refresh(
+        payload=jwt_token.generate_payload_refresh(user_id)
+    )
     return refresh_token
 
 

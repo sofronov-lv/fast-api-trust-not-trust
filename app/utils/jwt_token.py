@@ -6,7 +6,8 @@ from datetime import datetime, timedelta
 from app.core.config import setting
 
 
-def generate_payload_access(user_id: int, now: datetime = datetime.utcnow()) -> dict:
+def generate_payload_access(user_id: int) -> dict:
+    now = datetime.utcnow()
     return {
         "sub": user_id,
         "iat": now,
@@ -14,7 +15,8 @@ def generate_payload_access(user_id: int, now: datetime = datetime.utcnow()) -> 
     }
 
 
-def generate_payload_refresh(user_id: int, now: datetime = datetime.utcnow()) -> dict:
+def generate_payload_refresh(user_id: int) -> dict:
+    now = datetime.utcnow()
     return {
         "sub": user_id,
         "iat": now,
