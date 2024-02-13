@@ -125,7 +125,7 @@ async def get_users_by_ids(session: AsyncSession, ids: list[int]) -> list[User]:
     return list(users)
 
 
-async def search_users_by_params(session: AsyncSession, params: UserSearch, offset: int, limit: int) -> list[User]:
+async def search_users_by_params(session: AsyncSession, params: UserSearch) -> list[User]:
     stmt = (
         select(User)
         .order_by(User.id)
@@ -133,7 +133,7 @@ async def search_users_by_params(session: AsyncSession, params: UserSearch, offs
     for field, value in params.model_dump(exclude_none=True).items():
         stmt = stmt.where(getattr(User, field) == value)
 
-    result = await session.execute(stmt.offset(offset).limit(limit))
+    result = await session.execute(stmt.offset(params.offset).limit(params.limit))
     users = result.scalars().all()
     return list(users)
 

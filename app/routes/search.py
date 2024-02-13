@@ -15,17 +15,16 @@ from app.routes import utils
 router = APIRouter(prefix="/api/search", tags=["Search"])
 
 
-@router.post("/", response_model=list[UserOut])
+@router.get("", response_model=list[UserOut])
 async def search_users(
-        selection: UsersLimit,
         params: UserSearch,
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    return await user_service.search_users_by_params(session, params, selection.offset, selection.limit)
+    return await user_service.search_users_by_params(session, params)
 
 
-@router.post("/{fullname}", response_model=list[UserOut])
+@router.get("/{fullname}", response_model=list[UserOut])
 async def search_users_by_fullname(
         fullname: str,
         selection: UsersLimit,
@@ -35,7 +34,7 @@ async def search_users_by_fullname(
     return await user_service.search_users_by_fullname(session, fullname, selection.offset, selection.limit)
 
 
-@router.post("/contacts", response_model=list[UserOut])
+@router.get("/contacts", response_model=list[UserOut])
 async def get_contacts(
         selection: UsersLimit,
         contacts: UserContactList,
@@ -45,7 +44,7 @@ async def get_contacts(
     return await user_service.get_contact_list(session, contacts, selection.offset, selection.limit)
 
 
-@router.post("/evaluators", response_model=list[UserRatingOut])
+@router.get("/evaluators", response_model=list[UserRatingOut])
 async def get_evaluators(
         selection: UsersLimit,
         rating_in: RatingBase,

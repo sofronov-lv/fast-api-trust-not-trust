@@ -56,6 +56,8 @@ class UserSearch(UserBase):
     patronymic: str | None = None
     birthdate: str | None = None
     country: str | None = None
+    offset: int = 0
+    limit: int = 10
 
 
 class UserOut(UserBase):
