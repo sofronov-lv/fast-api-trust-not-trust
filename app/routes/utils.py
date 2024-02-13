@@ -7,7 +7,7 @@ from app.database.models import User
 
 from app.routes.services import user_service
 
-from app.routes.schemas.user_schemas import UserUpdatePartial, UserRegistration
+from app.routes.schemas.user_schemas import UserUpdatePartial, UserRegistration, UserSearch
 
 from app.utils import jwt_token
 
@@ -89,7 +89,7 @@ def refresh_access_token(cred: HTTPAuthorizationCredentials = Depends(http_beare
         )
 
 
-async def convert_params_user(user_update: UserUpdatePartial | UserRegistration):
+async def convert_params_user(user_update: UserUpdatePartial | UserRegistration | UserSearch):
     try:
         if user_update.birthdate:
             user_update.birthdate = user_service.convert_str_to_date(user_update.birthdate)

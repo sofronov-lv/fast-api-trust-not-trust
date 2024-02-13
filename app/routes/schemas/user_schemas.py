@@ -19,7 +19,7 @@ class UserUpdatePartial(UserBase):
     surname: str | None = None
     name: str | None = None
     patronymic: str | None = None
-    birthdate: str | None = None
+    birthdate: str | datetime.date | None = None
     country: str | None = None
     # city: str | None = None
     region: str | None = None
@@ -54,7 +54,7 @@ class UserSearch(UserBase):
     surname: str | None = None
     name: str | None = None
     patronymic: str | None = None
-    birthdate: str | None = None
+    birthdate: str | datetime.date | None = None
     country: str | None = None
 
 

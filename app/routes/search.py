@@ -22,6 +22,7 @@ async def search_users(
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
+    await utils.convert_params_user(params)
     return await user_service.search_users_by_params(session, params, selection.offset, selection.limit)
 
 
