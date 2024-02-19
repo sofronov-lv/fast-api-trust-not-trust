@@ -46,7 +46,7 @@ async def get_contacts(
     return await user_service.get_contact_list(session, contacts, selection.offset, selection.limit)
 
 
-@router.post("/evaluators", response_model=list[UserRatingOut])
+@router.post("/evaluators/", response_model=list[UserRatingOut])
 async def get_evaluators(
         selection: UsersLimit,
         rating_in: RatingBase,
