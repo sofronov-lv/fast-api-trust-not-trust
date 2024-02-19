@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.routes import utils
 
-from app.routes.schemas.user_schemas import UserOut, UserUpdatePartial, UserRegistration, Image
+from app.routes.schemas.user_schemas import UserOut, UserUpdatePartial, UserRegistration
 
 from app.routes.services import user_service
 
