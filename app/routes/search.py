@@ -36,7 +36,7 @@ async def search_users_by_fullname(
     return await user_service.search_users_by_fullname(session, fullname, selection.offset, selection.limit)
 
 
-@router.post("/contacts", response_model=list[UserOut])
+@router.post("/contacts/", response_model=list[UserOut])
 async def get_contacts(
         selection: UsersLimit,
         contacts: UserContactList,
