@@ -1,12 +1,12 @@
 import os.path
 
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, UploadFile, File
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.routes import utils
 
-from app.routes.schemas.user_schemas import UserOut, UserUpdatePartial, UserRegistration
+from app.routes.schemas.user_schemas import UserOut, UserUpdatePartial, UserRegistration, Image
 
 from app.routes.services import user_service
 
@@ -62,14 +62,15 @@ async def update_profile(
     return await user_service.update_user(session, auth, user_update)
 
 
-@router.patch("/update-avatar", response_model=UserOut)
+@router.patch("/update-avatar/", response_model=UserOut)
 async def update_avatar(
-        image: bytes,
+        file: UploadFile = File(...),
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
+    content = await file.read()
     with open(f"{BASE_PATH}{auth.id}.jpg", "wb") as file:
-        file.write(image)
+        file.write(content)
 
     return await user_service.update_user_avatar(session, auth)
 
