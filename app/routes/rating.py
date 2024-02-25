@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.routes import utils
 
-from app.routes.schemas.rating_schemas import RatingOut, RatingCreate, RatingScore
+from app.routes.schemas.rating_schemas import RatingOut, RatingCreate, RatingScore, RatingSearch
 
 from app.routes.services import user_service
 from app.routes.services import rating_service
@@ -12,6 +12,22 @@ from app.database.models import db_helper
 from app.database.models import User
 
 router = APIRouter(prefix="/api/rating", tags=["Rating"])
+
+
+@router.get("/my-evaluation/{user_id}", response_model=RatingOut)
+async def get_my_evaluation(
+        user_id: int,
+        auth: User = Depends(utils.get_current_active_auth_user),
+        session: AsyncSession = Depends(db_helper.session_dependency)
+):
+    rating_in = RatingSearch(user_id=user_id, evaluator_id=auth.id)
+    if rating := await rating_service.get_rating(session, rating_in):
+        return rating
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="The record was not found"
+    )
 
 
 async def check_validity_params(

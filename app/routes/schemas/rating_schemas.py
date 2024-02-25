@@ -7,6 +7,10 @@ class RatingBase(BaseModel):
     user_id: int
 
 
+class RatingSearch(RatingBase):
+    evaluator_id: int
+
+
 class RatingScore(RatingBase):
     feedback: bool
     score: int

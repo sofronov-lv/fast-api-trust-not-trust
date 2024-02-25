@@ -5,12 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import Rating
 
-from app.routes.schemas.rating_schemas import RatingCreate, RatingUpdate, RatingBase
+from app.routes.schemas.rating_schemas import RatingCreate, RatingUpdate, RatingBase, RatingSearch
 
 
 async def get_rating(
         session: AsyncSession,
-        rating_in: RatingBase | RatingCreate
+        rating_in: RatingSearch | RatingCreate
 ) -> Rating | None:
     stmt = (
         select(Rating).
