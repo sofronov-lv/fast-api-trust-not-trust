@@ -132,7 +132,7 @@ async def registration(
         auth: User = Depends(verifying_auth_unregistered_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    await utils.convert_params_user(user_update)
+    user_update = await utils.convert_params_user(user_update)
     return await user_service.update_user(session, auth, user_update, is_registration=True)
 
 

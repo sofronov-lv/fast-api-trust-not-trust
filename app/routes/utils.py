@@ -91,6 +91,15 @@ def refresh_access_token(cred: HTTPAuthorizationCredentials = Depends(http_beare
         )
 
 
+async def format_title_for_str(user_update: UserUpdatePartial | UserRegistration | UserSearch):
+    for name, value in user_update.model_dump().items():
+        if str == type(value):
+            value = value.title()
+        setattr(user_update, name, value)
+
+    return user_update
+
+
 async def convert_params_user(user_update: UserUpdatePartial | UserRegistration | UserSearch):
     try:
         if user_update.birthdate:
@@ -101,6 +110,8 @@ async def convert_params_user(user_update: UserUpdatePartial | UserRegistration 
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The birthday parameter was passed incorrectly"
         )
+    user_update = await format_title_for_str(user_update)
+    return user_update
 
 
 async def checking_registered(

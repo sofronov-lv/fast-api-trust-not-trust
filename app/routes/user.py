@@ -58,7 +58,7 @@ async def update_profile(
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    await utils.convert_params_user(user_update)
+    user_update = await utils.convert_params_user(user_update)
     return await user_service.update_user(session, auth, user_update)
 
 
@@ -91,7 +91,8 @@ async def add_user(
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
     await utils.checking_registered(session, phone_number)
-    await utils.convert_params_user(user_add)
+
+    user_add = await utils.convert_params_user(user_add)
     user = await user_service.create_user(session, phone_number)
 
     return await user_service.update_user(session, user, user_add)

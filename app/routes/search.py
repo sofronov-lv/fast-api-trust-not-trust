@@ -18,12 +18,12 @@ router = APIRouter(prefix="/api/search", tags=["Search"])
 @router.post("/", response_model=list[UserOut])
 async def search_users(
         selection: UsersLimit,
-        params: UserSearch,
+        user_search: UserSearch,
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    await utils.convert_params_user(params)
-    return await user_service.search_users_by_params(session, params, selection.offset, selection.limit)
+    user_search = await utils.convert_params_user(user_search)
+    return await user_service.search_users_by_params(session, user_search, selection.offset, selection.limit)
 
 
 @router.post("/{fullname}", response_model=list[UserOut])

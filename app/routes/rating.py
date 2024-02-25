@@ -1,33 +1,17 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.routes import utils
 
-from app.routes.schemas.rating_schemas import RatingBase, RatingUpdate, RatingOut, RatingCreate, RatingScore
+from app.routes.schemas.rating_schemas import RatingOut, RatingCreate, RatingScore
 
 from app.routes.services import user_service
 from app.routes.services import rating_service
 
 from app.database.models import db_helper
 from app.database.models import User
-from app.database.models import Rating
 
 router = APIRouter(prefix="/api/rating", tags=["Rating"])
-
-
-@router.get("/", response_model=RatingOut)
-async def get_rating(
-        rating_in: RatingBase,
-        auth: User = Depends(utils.get_current_active_auth_user),
-        session: AsyncSession = Depends(db_helper.session_dependency)
-):
-    if (rating := await rating_service.get_rating(session, rating_in)) is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="The record was not found"
-        )
-    return rating
 
 
 async def check_validity_params(

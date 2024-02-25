@@ -64,8 +64,6 @@ async def update_user(
         is_registration: bool = False
 ) -> User:
     for name, value in user_update.model_dump(exclude_none=True).items():
-        if str == type(value):
-            value = value.title()
         setattr(user, name, value)
 
     user.fullname = get_fullname(user.surname, user.name, user.patronymic)
