@@ -56,6 +56,7 @@ class UserSearch(UserBase):
     patronymic: str | None = None
     birthdate: str | datetime.date | None = None
     country: str | None = None
+    region: str | None = None
 
 
 class UserOut(UserBase):
