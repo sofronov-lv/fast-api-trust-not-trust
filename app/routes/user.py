@@ -26,7 +26,7 @@ async def get_avatar(
     if file_name == "DEFAULT":
         return FileResponse(DEFAULT_PATH)
 
-    path_to_avatar = f"{BASE_PATH}{file_name}.jpg"
+    path_to_avatar = f"{BASE_PATH}{file_name}.jpeg"
     if os.path.exists(path_to_avatar):
         return FileResponse(path_to_avatar)
 
@@ -68,10 +68,11 @@ async def update_avatar(
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    content = await file.read()
-    with open(f"{BASE_PATH}{auth.id}.jpg", "wb") as file:
-        file.write(content)
+    content = file.file.read()
+    utils.is_image(file)
 
+    with open(f"{BASE_PATH}{auth.id}.jpeg", "wb") as f:
+        f.write(content)
     return await user_service.update_user_avatar(session, auth)
 
 

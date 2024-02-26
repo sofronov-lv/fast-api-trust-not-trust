@@ -1,4 +1,4 @@
-from base64 import b64decode
+from PIL import Image
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -136,3 +136,16 @@ async def checking_user(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="User not found"
     )
+
+
+def is_image(file):
+    try:
+        img = Image.open(file.file)
+        img.verify()
+
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="File is not image"
+        )
+
