@@ -20,7 +20,7 @@ from app.utils.sms_api import send_sms
 router = APIRouter(prefix="/api", tags=["Auth"])
 
 
-@router.post("/code")
+@router.post("/code/")
 async def get_one_time_code(
         phone_number: str = Depends(utils.verifying_phone_number),
         session: AsyncSession = Depends(db_helper.session_dependency)
@@ -86,7 +86,7 @@ async def verifying_auth_registered_user(
     return await user_service.create_user(session, login.phone_number)
 
 
-@router.post("/login", response_model=TokenInfo)
+@router.post("/login/", response_model=TokenInfo)
 async def user_login(
         user: User = Depends(verifying_auth_registered_user)
 ):
@@ -109,7 +109,7 @@ async def verifying_auth_unregistered_user(
     return auth
 
 
-@router.post("/registration", response_model=UserOut)
+@router.post("/registration/", response_model=UserOut)
 async def registration(
         user_update: UserRegistration,
         auth: User = Depends(verifying_auth_unregistered_user),
@@ -119,7 +119,7 @@ async def registration(
     return await user_service.update_user(session, auth, user_update, is_registration=True)
 
 
-@router.post("/refresh-token", response_model=AccessToken)
+@router.post("/refresh-token/", response_model=AccessToken)
 async def refresh_access_token(
         new_access_token: str = Depends(utils.refresh_access_token)
 ):
