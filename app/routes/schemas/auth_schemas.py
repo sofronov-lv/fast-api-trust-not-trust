@@ -17,8 +17,8 @@ def get_date_life() -> datetime:
 
 
 class PhoneNumberBase(BaseModel):
-    country_code: str
-    number: str
+    country_code: int
+    number: int
 
 
 class OtcBase(BaseModel):

@@ -19,17 +19,7 @@ http_bearer = HTTPBearer()
 
 
 async def verifying_phone_number(phone: PhoneNumberBase):
-    if phone.country_code[0] != "+" or not [digit for digit in phone.country_code if digit.isdigit()]:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect country code format"
-        )
-    if not [digit for digit in phone.number if digit.isdigit()]:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect phone number format"
-        )
-    return phone.country_code + phone.number
+    return f"+{phone.country_code}{phone.number}"
 
 
 async def checking_registered(
