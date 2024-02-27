@@ -26,7 +26,7 @@ async def create_code(session: AsyncSession, phone_number: str) -> OneTimeCode:
 
 
 async def update_code_all(session: AsyncSession, code: OneTimeCode, phone_number: str) -> OneTimeCode:
-    code_update = CodeUpdate(hone_number=phone_number)
+    code_update = CodeUpdate(phone_number=phone_number)
     for name, value in code_update.model_dump().items():
         setattr(code, name, value)
 
