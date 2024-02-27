@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/search", tags=["Search"])
 
 
 @router.post("/", response_model=list[UserOut])
-async def search_users(
+async def search_users_by_params(
         selection: UsersLimit,
         user_search: UserSearch,
         auth: User = Depends(utils.get_current_active_auth_user),

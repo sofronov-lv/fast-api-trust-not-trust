@@ -48,7 +48,7 @@ async def check_validity_params(
     return RatingCreate(**rating.model_dump(), evaluator_id=auth.id)
 
 
-@router.post("/rate", response_model=RatingOut)
+@router.post("/rate/", response_model=RatingOut)
 async def rate_user(
         rating_create: RatingCreate = Depends(check_validity_params),
         session: AsyncSession = Depends(db_helper.session_dependency)

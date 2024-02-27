@@ -6,14 +6,50 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import db_helper
 from app.database.models import User
+from app.routes.schemas.auth_schemas import PhoneNumberBase
 
 from app.routes.services import user_service
 
 from app.routes.schemas.user_schemas import UserUpdatePartial, UserRegistration, UserSearch
 
 from app.utils import jwt_token
+from app.utils.sms_api import send_sms
 
 http_bearer = HTTPBearer()
+
+
+async def verifying_phone_number(phone: PhoneNumberBase):
+    if phone.country_code[0] != "+" or not [digit for digit in phone.country_code if digit.isdigit()]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect country code format"
+        )
+    if not [digit for digit in phone.number if digit.isdigit()]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect phone number format"
+        )
+    return phone.country_code + phone.number
+
+
+async def checking_registered(
+        phone_number: str = Depends(verifying_phone_number),
+        session: AsyncSession = Depends(db_helper.session_dependency)
+):
+    if await user_service.get_user_by_phone_number(session, phone_number):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"The user already exists"
+        )
+    return phone_number
+
+
+def check_sms(phone_number: str, text: str, id_: int):
+    if not send_sms(phone_number, text, id_):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to send sms"
+        )
 
 
 async def token_verification(cred: HTTPAuthorizationCredentials = Depends(http_bearer)) -> dict:
@@ -104,25 +140,14 @@ async def convert_params_user(user_update: UserUpdatePartial | UserRegistration 
     try:
         if user_update.birthdate:
             user_update.birthdate = user_service.convert_str_to_date(user_update.birthdate)
+        user_update = await format_title_for_str(user_update)
 
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The birthday parameter was passed incorrectly"
         )
-    user_update = await format_title_for_str(user_update)
     return user_update
-
-
-async def checking_registered(
-        session: AsyncSession,
-        phone_number: str
-):
-    if await user_service.get_user_by_phone_number(session, phone_number):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"The user already exists"
-        )
 
 
 async def checking_user(
@@ -148,4 +173,3 @@ def is_image(file):
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
             detail="File is not image"
         )
-

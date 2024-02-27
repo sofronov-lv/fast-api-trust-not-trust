@@ -16,12 +16,16 @@ def get_date_life() -> datetime:
     return datetime.utcnow() + timedelta(minutes=10)
 
 
-class CodeBase(BaseModel):
+class PhoneNumberBase(BaseModel):
+    country_code: str
+    number: str
+
+
+class OtcBase(BaseModel):
     phone_number: str
-    code: str
 
 
-class CodeCreate(CodeBase):
+class CodeCreate(OtcBase):
     code: str = Field(default_factory=generate_code)
     date_update: datetime = Field(default_factory=get_date_update)
     date_life: datetime = Field(default_factory=get_date_life)
@@ -34,7 +38,7 @@ class CodeUpdate(CodeCreate):
     pass
 
 
-class CodeOut(CodeBase):
+class CodeOut(OtcBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

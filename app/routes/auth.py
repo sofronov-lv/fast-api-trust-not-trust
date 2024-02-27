@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.routes import utils
 
-from app.routes.schemas.auth_schemas import TokenInfo, CodeUpdate, CodeCreate, AccessToken
+from app.routes.schemas.auth_schemas import TokenInfo, AccessToken
 from app.routes.schemas.user_schemas import UserOut, UserRegistration, UserLogin
 
 from app.routes.services import user_service
@@ -20,97 +20,80 @@ from app.utils.sms_api import send_sms
 router = APIRouter(prefix="/api", tags=["Auth"])
 
 
-@router.get("/code")
-async def get_code(
-        phone_number: str,
+@router.post("/code")
+async def get_one_time_code(
+        phone_number: str = Depends(utils.verifying_phone_number),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    if (otc := await auth_service.get_code(session, phone_number)) is None:
-        code = await auth_service.create_code(session, CodeCreate(phone_number=phone_number))
+    if otc := await auth_service.get_code(session, phone_number):
+        if otc.date_update > datetime.datetime.utcnow():
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="You need to wait 1 minute before sending a new SMS message"
+            )
+        code = await auth_service.update_code_all(session, otc, phone_number)
 
-    elif otc.date_update > datetime.datetime.utcnow():
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="You need to wait 1 minute before sending a new SMS message"
-        )
     else:
-        code = await auth_service.update_code_all(session, otc, CodeUpdate(phone_number=phone_number))
+        code = await auth_service.create_code(session, phone_number)
 
-    # if send_sms(phone_number, code.code, code.id):
-    #     return JSONResponse(
-    #         status_code=200,
-    #         content={"message": "The code has been sent successfully"}
-    #     )
-    if code:
-        return JSONResponse(
-            status_code=200,
-            content={"message": code.code}
-        )
-    raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Failed to send sms"
+    utils.check_sms(phone_number, code.code, code.id)
+    return JSONResponse(
+        status_code=200,
+        content={"message": "The code has been sent successfully"}
     )
 
 
 async def validate_auth_user(
-        auth: UserLogin,
+        login: UserLogin,
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    if (otc := await auth_service.get_code(session, auth.phone_number)) is None:
+    if (otc := await auth_service.get_code(session, login.phone_number)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="The user with this phone number was not found"
         )
-
     elif otc.approved:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The code has already been applied before"
         )
-
     elif otc.date_life < datetime.datetime.utcnow():
         raise HTTPException(
             status_code=status.HTTP_410_GONE,
             detail="The code's lifetime has expired"
         )
-
     elif otc.attempts > 2:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="The number of attempts to enter the code has been exceeded"
         )
-
-    elif otc.code == auth.code:
-        await auth_service.approve_code(session, otc)
-        return auth
-
-    await auth_service.update_code_attempt(session, otc)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="The code was entered incorrectly"
-    )
+    elif otc.code != login.code:
+        await auth_service.update_code_attempt(session, otc)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="The code was entered incorrectly"
+        )
+    await auth_service.approve_code(session, otc)
+    return login
 
 
 async def verifying_auth_registered_user(
-        auth: UserLogin = Depends(validate_auth_user),
+        login: UserLogin = Depends(validate_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    if user := await user_service.get_user_by_phone_number(session, auth.phone_number):
+    if user := await user_service.get_user_by_phone_number(session, login.phone_number):
         return user
-    return await user_service.create_user(session, auth.phone_number)
+    return await user_service.create_user(session, login.phone_number)
 
 
 @router.post("/login", response_model=TokenInfo)
-async def login(
+async def user_login(
         user: User = Depends(verifying_auth_registered_user)
 ):
-    access_token = utils.get_access_token(user.id)
-    refresh_token = utils.get_refresh_token(user.id)
-
     return TokenInfo(
         is_registered=user.is_registered,
-        access_token=access_token,
-        refresh_token=refresh_token,
+        access_token=utils.get_access_token(user.id),
+        refresh_token=utils.get_refresh_token(user.id),
         token_type="Bearer"
     )
 
@@ -140,6 +123,4 @@ async def registration(
 async def refresh_access_token(
         new_access_token: str = Depends(utils.refresh_access_token)
 ):
-    return AccessToken(
-        access_token=new_access_token
-    )
+    return AccessToken(access_token=new_access_token)

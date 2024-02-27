@@ -27,13 +27,12 @@ async def get_avatar(
         return FileResponse(DEFAULT_PATH)
 
     path_to_avatar = f"{BASE_PATH}{file_name}.jpeg"
-    if os.path.exists(path_to_avatar):
-        return FileResponse(path_to_avatar)
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="An avatar with that name was not found"
-    )
+    if not os.path.exists(path_to_avatar):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="An avatar with that name was not found"
+        )
+    return FileResponse(path_to_avatar)
 
 
 @router.get("/{user_id}", response_model=UserOut)
@@ -52,7 +51,7 @@ async def profile(
     return auth
 
 
-@router.patch("/update-profile", response_model=UserOut)
+@router.patch("/update-profile/", response_model=UserOut)
 async def update_profile(
         user_update: UserUpdatePartial,
         auth: User = Depends(utils.get_current_active_auth_user),
@@ -76,7 +75,7 @@ async def update_avatar(
     return await user_service.update_user_avatar(session, auth)
 
 
-@router.delete("/delete-avatar", response_model=UserOut)
+@router.delete("/delete-avatar/", response_model=UserOut)
 async def delete_avatar(
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
@@ -84,16 +83,14 @@ async def delete_avatar(
     return await user_service.delete_user_avatar(session, auth)
 
 
-@router.post("/add-new-user", response_model=UserOut)
+@router.post("/add-new-user/", response_model=UserOut)
 async def add_user(
-        phone_number: str,
         user_add: UserRegistration,
-        auth: User = Depends(utils.get_current_verified_user),
+        phone_number: str = Depends(utils.checking_registered),
+        auth: User = Depends(utils.get_current_active_auth_user),  # Depends(utils.get_current_verified_user)
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    await utils.checking_registered(session, phone_number)
-
+    utils.check_sms(phone_number, text="New user", id_=auth.id)
     user_add = await utils.convert_params_user(user_add)
     user = await user_service.create_user(session, phone_number)
-
     return await user_service.update_user(session, user, user_add)

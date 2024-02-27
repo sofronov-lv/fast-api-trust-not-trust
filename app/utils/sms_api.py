@@ -67,16 +67,20 @@ class IQSms:
 iq_sms = IQSms()
 
 
-def send_sms(phone_number: str, code: str, id_: int):
-    """Sending sms packet"""
-    message = {
-        "clientId": str(id_),
-        "phone": phone_number,
-        "text": code,
-        "sender": "Trust"
-    }
-    if not (response := iq_sms.send(message)):
+def checking_sent_msg(msg: dict):
+    if not (response := iq_sms.send(msg)):
         return False
 
     result = eval(response.text)
     return True if result["messages"][0]["status"] == "accepted" else False
+
+
+def send_sms(phone_number: str, text: str, id_: int):
+    """Sending sms packet"""
+    message = {
+        "clientId": str(id_),
+        "phone": phone_number,
+        "text": text,
+        "sender": "Trust"
+    }
+    return checking_sent_msg(message)
