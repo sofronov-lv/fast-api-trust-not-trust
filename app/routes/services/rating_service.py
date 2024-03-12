@@ -3,9 +3,9 @@ import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.models import Rating
+from app.database.models import Rating, Complaint
 
-from app.routes.schemas.rating_schemas import RatingCreate, RatingUpdate, RatingBase, RatingSearch
+from app.routes.schemas.rating_schemas import RatingCreate, RatingUpdate, RatingBase, RatingSearch, ComplaintCreate
 
 
 async def get_rating(
@@ -41,7 +41,10 @@ async def get_ratings(
 
 
 async def create_rating(session: AsyncSession, rating_create: RatingCreate) -> Rating:
-    rating = Rating(**rating_create.model_dump(), date=datetime.datetime.utcnow())
+    rating = Rating(
+        **rating_create.model_dump(),
+        date=datetime.datetime.utcnow()
+    )
     session.add(rating)
     await session.commit()
     await session.refresh(rating)
@@ -59,3 +62,35 @@ async def update_rating(
 
     await session.commit()
     return rating
+
+
+async def create_complaint(
+        session: AsyncSession,
+        complaint_create: ComplaintCreate,
+        complaining_user_id: int
+) -> Complaint:
+    complaint = Complaint(
+        **complaint_create.model_dump(),
+        complaining_user_id=complaining_user_id,
+        date=datetime.datetime.utcnow()
+    )
+    session.add(complaint)
+    await session.commit()
+    await session.refresh(complaint)
+    return complaint
+
+
+async def get_complaint(
+        session: AsyncSession,
+        user_id: int,
+        complaining_user_id: int
+) -> Complaint | None:
+    stmt = (
+        select(Complaint)
+        .where(Complaint.user_id == user_id)
+        .where(Complaint.complaining_user_id == complaining_user_id)
+        .where(Complaint.is_reviewed.is_(False))
+    )
+    result = await session.execute(stmt)
+    ratings = result.scalars().one_or_none()
+    return ratings

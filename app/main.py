@@ -52,4 +52,3 @@ if __name__ == "__main__":
 
     custom_gunicorn_app = CustomGunicornApp(app)
     custom_gunicorn_app.run()
-    # uvicorn.run("main:app", reload=True)

@@ -15,7 +15,6 @@ from app.routes.services import auth_service
 from app.database.models import db_helper
 from app.database.models import User
 
-from app.utils.sms_api import send_sms
 
 router = APIRouter(prefix="/api", tags=["Auth"])
 

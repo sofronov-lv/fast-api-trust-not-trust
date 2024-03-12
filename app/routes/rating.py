@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.routes import utils
 
 from app.routes.schemas.rating_schemas import RatingOut, RatingCreate, RatingScore, RatingSearch
+from app.routes.schemas.rating_schemas import ComplaintCreate, ComplaintOut
 
 from app.routes.services import user_service
 from app.routes.services import rating_service
@@ -65,3 +66,19 @@ async def rate_user(
     await user_service.update_user_rating(session, new_rating, user, multiplier=1)
 
     return new_rating
+
+
+@router.post("/complaint/", response_model=ComplaintOut)
+async def complaint_about_the_user(
+        complaint_create: ComplaintCreate,
+        auth: User = Depends(utils.get_current_active_auth_user),
+        session: AsyncSession = Depends(db_helper.session_dependency)
+):
+    await utils.checking_user(session, complaint_create.user_id)
+
+    if await rating_service.get_complaint(session, complaint_create.user_id, auth.id):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="The complaint has already been submitted for consideration"
+        )
+    return await rating_service.create_complaint(session, complaint_create, auth.id)

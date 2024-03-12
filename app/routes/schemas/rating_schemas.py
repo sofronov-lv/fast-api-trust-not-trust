@@ -1,6 +1,6 @@
 import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 
 
 class RatingBase(BaseModel):
@@ -27,3 +27,19 @@ class RatingUpdate(RatingCreate):
 class RatingOut(RatingCreate):
     id: int
     date: datetime.datetime
+
+
+class ComplaintBase(BaseModel):
+    pass
+
+
+class ComplaintCreate(ComplaintBase):
+    user_id: int
+    reason: constr(max_length=255)
+
+
+class ComplaintOut(ComplaintCreate):
+    id: int
+    complaining_user_id: int
+    date: datetime.date | None
+    is_reviewed: bool
