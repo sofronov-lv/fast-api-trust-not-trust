@@ -4,11 +4,9 @@ from fastapi import APIRouter, HTTPException, status, Depends, UploadFile, File
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.routes import utils
-
 from app.routes.schemas.user_schemas import UserOut, UserUpdatePartial, UserRegistration
 
-from app.routes.services import user_service
+from app.routes.services import user_service, utils
 
 from app.database.models import db_helper
 from app.database.models import User

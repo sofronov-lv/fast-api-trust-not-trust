@@ -4,12 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.routes import utils
-
-from app.routes.schemas.auth_schemas import TokenInfo, AccessToken
+from app.routes.schemas.auth_schemas import AuthInfo, AccessToken
 from app.routes.schemas.user_schemas import UserOut, UserRegistration, UserLogin
 
-from app.routes.services import user_service
+from app.routes.services import user_service, utils
 from app.routes.services import auth_service
 
 from app.database.models import db_helper
@@ -85,11 +83,13 @@ async def verifying_auth_registered_user(
     return await user_service.create_user(session, login.phone_number)
 
 
-@router.post("/login/", response_model=TokenInfo)
+@router.post("/login/", response_model=AuthInfo)
 async def user_login(
         user: User = Depends(verifying_auth_registered_user)
 ):
-    return TokenInfo(
+    return AuthInfo(
+        is_admin=user.is_admin,
+        is_active=user.is_active,
         is_registered=user.is_registered,
         access_token=utils.get_access_token(user.id),
         refresh_token=utils.get_refresh_token(user.id),

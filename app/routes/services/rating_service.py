@@ -1,17 +1,16 @@
 import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import Rating, Complaint
 
-from app.routes.schemas.rating_schemas import RatingCreate, RatingUpdate, RatingBase, RatingSearch, ComplaintCreate
+from app.routes.schemas.rating_schemas import RatingCreate, RatingUpdate, RatingBase, RatingSearch, ComplaintCreate, \
+    ComplaintSearch
+from app.routes.schemas.user_schemas import UsersLimit
 
 
-async def get_rating(
-        session: AsyncSession,
-        rating_in: RatingSearch | RatingCreate
-) -> Rating | None:
+async def get_rating(session: AsyncSession, rating_in: RatingSearch | RatingCreate) -> Rating | None:
     stmt = (
         select(Rating).
         where(Rating.user_id == rating_in.user_id).
@@ -22,18 +21,13 @@ async def get_rating(
     return rating
 
 
-async def get_ratings(
-        session: AsyncSession,
-        rating_in: RatingBase,
-        offset: int,
-        limit: int,
-) -> list[Rating]:
+async def get_ratings(session: AsyncSession, rating_in: RatingBase, selection: UsersLimit) -> list[Rating]:
     stmt = (
         select(Rating)
         .order_by(Rating.evaluator_id)
         .where(Rating.user_id == rating_in.user_id)
-        .offset(offset)
-        .limit(limit)
+        .offset(selection.offset)
+        .limit(selection.limit)
     )
     result = await session.execute(stmt)
     ratings = result.scalars().all()
@@ -51,11 +45,7 @@ async def create_rating(session: AsyncSession, rating_create: RatingCreate) -> R
     return rating
 
 
-async def update_rating(
-        session: AsyncSession,
-        rating: Rating,
-        rating_update: RatingUpdate | RatingCreate
-) -> Rating:
+async def update_rating(session: AsyncSession, rating: Rating, rating_update: RatingUpdate | RatingCreate) -> Rating:
     rating.date = datetime.datetime.utcnow()
     for name, value in rating_update.model_dump(exclude_none=True).items():
         setattr(rating, name, value)
@@ -64,14 +54,10 @@ async def update_rating(
     return rating
 
 
-async def create_complaint(
-        session: AsyncSession,
-        complaint_create: ComplaintCreate,
-        complaining_user_id: int
-) -> Complaint:
+async def create_complaint(session: AsyncSession, complaint_create: ComplaintCreate, user_id: int) -> Complaint:
     complaint = Complaint(
         **complaint_create.model_dump(),
-        complaining_user_id=complaining_user_id,
+        complaining_user_id=user_id,
         date=datetime.datetime.utcnow()
     )
     session.add(complaint)
@@ -80,17 +66,53 @@ async def create_complaint(
     return complaint
 
 
-async def get_complaint(
-        session: AsyncSession,
-        user_id: int,
-        complaining_user_id: int
-) -> Complaint | None:
+async def get_complaints_about_user(session: AsyncSession, user_id: int) -> Complaint | None:
     stmt = (
         select(Complaint)
         .where(Complaint.user_id == user_id)
-        .where(Complaint.complaining_user_id == complaining_user_id)
         .where(Complaint.is_reviewed.is_(False))
     )
     result = await session.execute(stmt)
-    ratings = result.scalars().one_or_none()
-    return ratings
+    complaint = result.scalars().first()
+    return complaint
+
+
+async def get_complaint(session: AsyncSession, complaint_in: ComplaintSearch) -> Complaint | None:
+    stmt = (
+        select(Complaint)
+        .where(Complaint.user_id == complaint_in.user_id)
+        .where(Complaint.complaining_user_id == complaint_in.complaining_user_id)
+        .where(Complaint.is_reviewed.is_(False))
+    )
+    result = await session.execute(stmt)
+    complaint = result.scalars().one_or_none()
+    return complaint
+
+
+async def get_complaints(session: AsyncSession, selection: UsersLimit) -> list[Complaint]:
+    stmt = (
+        select(Complaint)
+        .order_by(Complaint.id)
+        .where(Complaint.is_reviewed.is_(False))
+        .offset(selection.offset)
+        .limit(selection.limit)
+    )
+    result = await session.execute(stmt)
+    complaints = result.scalars().all()
+    return list(complaints)
+
+
+async def deactivate_complaints_about_blocked_user(session: AsyncSession, user_id: int) -> None:
+    stmt = (
+        update(Complaint)
+        .where(Complaint.user_id == user_id)
+        .values(is_reviewed=False)
+    )
+    await session.execute(stmt)
+    await session.commit()
+
+
+async def update_review(session: AsyncSession, complaint_in: Complaint) -> Complaint:
+    complaint_in.is_reviewed = True
+    await session.commit()
+    return complaint_in

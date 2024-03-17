@@ -16,6 +16,7 @@ from app.routes.auth import router as auth_router
 from app.routes.rating import router as rate_router
 from app.routes.search import router as search_router
 from app.routes.user import router as user_router
+from app.routes.admin import router as admin_router
 
 
 class CustomGunicornApp(BaseApplication):
@@ -49,6 +50,7 @@ if __name__ == "__main__":
     app.include_router(rate_router)
     app.include_router(search_router)
     app.include_router(user_router)
+    app.include_router(admin_router)
 
     custom_gunicorn_app = CustomGunicornApp(app)
     custom_gunicorn_app.run()

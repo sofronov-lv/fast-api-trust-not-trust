@@ -6,13 +6,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.models import User
 from app.database.models import Rating
 
-from app.core.config import BASE_LINK, DEFAULT_LINK
-
 from app.routes.schemas.user_schemas import (
     UserUpdatePartial,
     UserContactList,
     UserRegistration,
-    UserSearch
+    UserSearch,
+    UsersLimit
 )
 
 
@@ -43,6 +42,7 @@ async def get_user_by_phone_number(session: AsyncSession, phone_number: str) -> 
     stmt = (
         select(User)
         .where(User.phone_number == phone_number)
+        .where(User.is_active.is_(True))
     )
     result = await session.execute(stmt)
     user = result.scalars().one_or_none()
@@ -89,60 +89,74 @@ async def update_user_rating(session: AsyncSession, rating: Rating, user: User, 
 
 
 async def update_user_avatar(session: AsyncSession, user: User) -> User:
-    user.path_to_avatar = f"{BASE_LINK}{user.id}"
+    user.file_name = str(user.id)
     await session.commit()
     return user
 
 
 async def delete_user_avatar(session: AsyncSession, user: User) -> User:
-    user.path_to_avatar = DEFAULT_LINK
+    user.file_name = "DEFAULT"
     await session.commit()
     return user
 
 
-async def get_contact_list(session: AsyncSession, contacts: UserContactList, offset: int, limit: int) -> list[User]:
+async def block_user(session: AsyncSession, user: User) -> User:
+    user.is_active = False
+    await session.commit()
+    return user
+
+
+async def get_contact_list(session: AsyncSession, contacts: UserContactList, selection: UsersLimit) -> list[User]:
     stmt = (
         select(User)
         .where(User.phone_number.in_(contacts.phone_numbers))
-        .offset(offset)
-        .limit(limit)
+        .where(User.is_active.is_(True))
+        .offset(selection.offset)
+        .limit(selection.limit)
     )
     result = await session.execute(stmt)
     users = result.scalars().all()
     return list(users)
 
 
-async def get_users_by_ids(session: AsyncSession, ids: list[int]) -> list[User]:
+async def get_evaluators_by_ids(session: AsyncSession, ids: list[int]) -> list[User]:
     stmt = (
         select(User)
+        .order_by(User.id)
         .where(User.id.in_(ids))
-        .order_by(User.id)
     )
     result = await session.execute(stmt)
     users = result.scalars().all()
     return list(users)
 
 
-async def search_users_by_params(session: AsyncSession, params: UserSearch, offset: int, limit: int) -> list[User]:
+async def search_users_by_params(session: AsyncSession, params: UserSearch, selection: UsersLimit) -> list[User]:
     stmt = (
         select(User)
-        .order_by(User.id)
+        .where(User.is_active.is_(True))
     )
     for field, value in params.model_dump(exclude_none=True).items():
-        stmt = stmt.where(getattr(User, field) == value)
+        stmt = stmt.filter(getattr(User, field) == value)
 
-    result = await session.execute(stmt.offset(offset).limit(limit))
+    stmt = (
+        stmt
+        .order_by(User.id)
+        .offset(selection.offset)
+        .limit(selection.limit)
+    )
+    result = await session.execute(stmt)
     users = result.scalars().all()
     return list(users)
 
 
-async def search_users_by_fullname(session: AsyncSession, fullname: str, offset: int, limit: int) -> list[User]:
+async def search_users_by_fullname(session: AsyncSession, fullname: str, selection: UsersLimit) -> list[User]:
     stmt = (
         select(User)
         .order_by(User.id)
         .where(User.fullname.like(f"%{fullname.title()}%"))
-        .offset(offset)
-        .limit(limit)
+        .where(User.is_active.is_(True))
+        .offset(selection.offset)
+        .limit(selection.limit)
     )
     result = await session.execute(stmt)
     users = result.scalars().all()

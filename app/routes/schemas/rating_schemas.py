@@ -33,6 +33,11 @@ class ComplaintBase(BaseModel):
     pass
 
 
+class ComplaintSearch(ComplaintBase):
+    user_id: int
+    complaining_user_id: int
+
+
 class ComplaintCreate(ComplaintBase):
     user_id: int
     reason: constr(max_length=255)

@@ -1,12 +1,10 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.routes import utils
-
-from app.routes.schemas.rating_schemas import RatingOut, RatingCreate, RatingScore, RatingSearch
+from app.routes.schemas.rating_schemas import RatingOut, RatingCreate, RatingScore, RatingSearch, ComplaintSearch
 from app.routes.schemas.rating_schemas import ComplaintCreate, ComplaintOut
 
-from app.routes.services import user_service
+from app.routes.services import user_service, utils
 from app.routes.services import rating_service
 
 from app.database.models import db_helper
@@ -75,8 +73,12 @@ async def complaint_about_the_user(
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
     await utils.checking_user(session, complaint_create.user_id)
+    complaint_in = ComplaintSearch(
+        user_id=complaint_create.user_id,
+        complaining_user_id=auth.id
+    )
 
-    if await rating_service.get_complaint(session, complaint_create.user_id, auth.id):
+    if await rating_service.get_complaint(session, complaint_in):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="The complaint has already been submitted for consideration"

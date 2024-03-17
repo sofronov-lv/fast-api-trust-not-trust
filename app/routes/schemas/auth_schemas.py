@@ -48,11 +48,19 @@ class CodeOut(OtcBase):
     attempts: int
 
 
-class AccessToken(BaseModel):
-    access_token: str
+class TokenBase(BaseModel):
     token_type: str = "Bearer"
 
 
-class TokenInfo(AccessToken):
-    is_registered: bool
+class AccessToken(TokenBase):
+    access_token: str
+
+
+class RefreshToken(TokenBase):
     refresh_token: str
+
+
+class AuthInfo(AccessToken, RefreshToken):
+    is_admin: bool
+    is_active: bool
+    is_registered: bool
