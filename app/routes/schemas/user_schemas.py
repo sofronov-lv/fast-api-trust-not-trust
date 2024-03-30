@@ -40,7 +40,7 @@ class UserRegistration(UserBase):
     region: str
 
 
-class UsersLimit(UserBase):
+class UsersSelection(UserBase):
     offset: int = 0
     limit: int = 10
 
@@ -64,7 +64,7 @@ class UserOut(UserBase):
 
     id: int
     phone_number: str
-    path_to_avatar: str
+    file_name: str
     surname: str | None
     name: str | None
     patronymic: str | None = None

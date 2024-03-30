@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.routes.schemas.user_schemas import UserOut, UserContactList, UserSearch, UsersLimit, UserRatingOut
+from app.routes.schemas.user_schemas import UserOut, UserContactList, UserSearch, UsersSelection, UserRatingOut
 from app.routes.schemas.rating_schemas import RatingBase, ComplaintOut
 
 from app.routes.services import user_service, utils
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/search", tags=["Search"])
 
 @router.post("/", response_model=list[UserOut])
 async def search_users_by_params(
-        selection: UsersLimit,
+        selection: UsersSelection,
         user_search: UserSearch,
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
@@ -27,7 +27,7 @@ async def search_users_by_params(
 @router.post("/{fullname}", response_model=list[UserOut])
 async def search_users_by_fullname(
         fullname: str,
-        selection: UsersLimit,
+        selection: UsersSelection,
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
@@ -36,7 +36,7 @@ async def search_users_by_fullname(
 
 @router.post("/contacts/", response_model=list[UserOut])
 async def get_contacts(
-        selection: UsersLimit,
+        selection: UsersSelection,
         contacts: UserContactList,
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
@@ -46,7 +46,7 @@ async def get_contacts(
 
 @router.post("/evaluators/", response_model=list[UserRatingOut])
 async def get_evaluators(
-        selection: UsersLimit,
+        selection: UsersSelection,
         rating_in: RatingBase,
         auth: User = Depends(utils.get_current_active_auth_user),
         session: AsyncSession = Depends(db_helper.session_dependency)

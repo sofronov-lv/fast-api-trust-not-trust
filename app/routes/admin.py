@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
 
 from app.routes.schemas.rating_schemas import ComplaintOut, ComplaintSearch
-from app.routes.schemas.user_schemas import UsersLimit
+from app.routes.schemas.user_schemas import UsersSelection
 
 from app.routes.services import user_service, utils, rating_service
 
@@ -48,7 +48,7 @@ async def cancel_the_complaint(
 
 @router.post("/complaints/", response_model=list[ComplaintOut])
 async def get_complaints(
-        selection: UsersLimit,
+        selection: UsersSelection,
         auth: User = Depends(utils.get_current_admin_user),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):

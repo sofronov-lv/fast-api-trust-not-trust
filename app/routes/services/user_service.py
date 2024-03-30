@@ -11,7 +11,7 @@ from app.routes.schemas.user_schemas import (
     UserContactList,
     UserRegistration,
     UserSearch,
-    UsersLimit
+    UsersSelection
 )
 
 
@@ -106,7 +106,7 @@ async def block_user(session: AsyncSession, user: User) -> User:
     return user
 
 
-async def get_contact_list(session: AsyncSession, contacts: UserContactList, selection: UsersLimit) -> list[User]:
+async def get_contact_list(session: AsyncSession, contacts: UserContactList, selection: UsersSelection) -> list[User]:
     stmt = (
         select(User)
         .where(User.phone_number.in_(contacts.phone_numbers))
@@ -130,7 +130,7 @@ async def get_evaluators_by_ids(session: AsyncSession, ids: list[int]) -> list[U
     return list(users)
 
 
-async def search_users_by_params(session: AsyncSession, params: UserSearch, selection: UsersLimit) -> list[User]:
+async def search_users_by_params(session: AsyncSession, params: UserSearch, selection: UsersSelection) -> list[User]:
     stmt = (
         select(User)
         .where(User.is_active.is_(True))
@@ -149,7 +149,7 @@ async def search_users_by_params(session: AsyncSession, params: UserSearch, sele
     return list(users)
 
 
-async def search_users_by_fullname(session: AsyncSession, fullname: str, selection: UsersLimit) -> list[User]:
+async def search_users_by_fullname(session: AsyncSession, fullname: str, selection: UsersSelection) -> list[User]:
     stmt = (
         select(User)
         .order_by(User.id)

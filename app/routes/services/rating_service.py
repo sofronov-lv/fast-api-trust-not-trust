@@ -7,7 +7,7 @@ from app.database.models import Rating, Complaint
 
 from app.routes.schemas.rating_schemas import RatingCreate, RatingUpdate, RatingBase, RatingSearch, ComplaintCreate, \
     ComplaintSearch
-from app.routes.schemas.user_schemas import UsersLimit
+from app.routes.schemas.user_schemas import UsersSelection
 
 
 async def get_rating(session: AsyncSession, rating_in: RatingSearch | RatingCreate) -> Rating | None:
@@ -21,7 +21,7 @@ async def get_rating(session: AsyncSession, rating_in: RatingSearch | RatingCrea
     return rating
 
 
-async def get_ratings(session: AsyncSession, rating_in: RatingBase, selection: UsersLimit) -> list[Rating]:
+async def get_ratings(session: AsyncSession, rating_in: RatingBase, selection: UsersSelection) -> list[Rating]:
     stmt = (
         select(Rating)
         .order_by(Rating.evaluator_id)
@@ -89,7 +89,7 @@ async def get_complaint(session: AsyncSession, complaint_in: ComplaintSearch) ->
     return complaint
 
 
-async def get_complaints(session: AsyncSession, selection: UsersLimit) -> list[Complaint]:
+async def get_complaints(session: AsyncSession, selection: UsersSelection) -> list[Complaint]:
     stmt = (
         select(Complaint)
         .order_by(Complaint.id)
