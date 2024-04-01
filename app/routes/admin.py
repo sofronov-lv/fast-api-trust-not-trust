@@ -22,8 +22,7 @@ async def block_a_user(
 ):
     user = await utils.checking_user(session, user_id)
     await user_service.block_user(session, user)
-
-    await rating_service.deactivate_complaints_about_blocked_user(session, user_id)
+    await rating_service.update_all_reviews_about_blocked_user(session, user_id)
 
     return JSONResponse(
         status_code=200,

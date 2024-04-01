@@ -102,11 +102,11 @@ async def get_complaints(session: AsyncSession, selection: UsersSelection) -> li
     return list(complaints)
 
 
-async def deactivate_complaints_about_blocked_user(session: AsyncSession, user_id: int) -> None:
+async def update_all_reviews_about_blocked_user(session: AsyncSession, user_id: int) -> None:
     stmt = (
         update(Complaint)
         .where(Complaint.user_id == user_id)
-        .values(is_reviewed=False)
+        .values(is_reviewed=True)
     )
     await session.execute(stmt)
     await session.commit()
