@@ -33,15 +33,11 @@ async def get_one_time_code(
     else:
         code = await auth_service.create_code(session, phone_number)
 
+    utils.check_sms(phone_number, code.code, code.id)
     return JSONResponse(
         status_code=200,
-        content={"message": code.code}
+        content={"message": "The code has been sent successfully"}
     )
-    # utils.check_sms(phone_number, code.code, code.id)
-    # return JSONResponse(
-    #     status_code=200,
-    #     content={"message": "The code has been sent successfully"}
-    # )
 
 
 async def validate_auth_user(
