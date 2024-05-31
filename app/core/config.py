@@ -17,9 +17,6 @@ DB_PASS = os.getenv("DB_PASS")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 
-API_HOST = os.getenv("API_HOST")
-API_PORT = os.getenv("API_PORT")
-
 KEY_PATH = Path("app/core/certs")
 
 BASE_PATH = "app/images/avatars/"

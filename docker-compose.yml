@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14.11
+    container_name: tnt_db
+    env_file:
+      - app/core/.env
+
+  app:
+    build:
+      context: .
+    env_file:
+      - app/core/.env
+    container_name: tnt_app
+    ports:
+      - 9999:8000
+    depends_on:
+      - db
