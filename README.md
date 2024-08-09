@@ -51,7 +51,7 @@ To install this project, follow these steps:
    ```
 (Attention! This application uses a third-party microservice to send SMS. If you do not have an account on the site https://iqsms.ru / - you will have to change part of the code for correct review [STEP 7])
 
-7. Изменение кода:
+7. Changing the code:
    Attention!!! This step is for users who do not have an account on iq.sms or for those who do not want to receive SMS confirmation, but only check the functionality of Trust Not Trust.
 
    Open file app/routes/auth.py
@@ -74,7 +74,15 @@ To install this project, follow these steps:
         content={"message": f"Code: {code.code}"}
       )
 
-
-### The last point (Launching the API):
+8. PostgreSQL
+   Create a database in postgresql that will match the variables created in the .env file
+   
+9. Launching the API:
+   Run the following command in the terminal:
    ```bash
    gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+
+## Documentation 📑
+   All the functionality after launching the API will be located at the following address: http://0.0.0.0:8000/docs.
+   When you create an application on FastAPI, it automatically generates OpenAPI documentation based on your routes and annotations.
+   FastAPI provides embedded documentation (Swagger UI and ReDoc) where you can see and test the API using the OpenAPI specification.
