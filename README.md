@@ -37,14 +37,14 @@ To install this project, follow these steps:
 
 6. Declare the following variables in the .env file:
    ```text
-   IQ_SMS_LOGIN=z123
-   IQ_SMS_PASSWORD=123
+   IQ_SMS_LOGIN=login
+   IQ_SMS_PASSWORD=password123
 
-   DB_USER=postgres
-   DB_NAME=trust_db
-   DB_PASS=123
+   DB_USER=username
+   DB_NAME=database_name
+   DB_PASS=db_password
    DB_HOST=localhost
-   DB_PORT=5432
+   DB_PORT=1234
    
    API_HOST=0.0.0.0
    API_PORT=5000
