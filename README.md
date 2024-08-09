@@ -52,10 +52,13 @@ To install this project, follow these steps:
 (Attention! This application uses a third-party microservice to send SMS. If you do not have an account on the site https://iqsms.ru / - you will have to change part of the code for correct review [STEP 7])
 
 7. Изменение кода:
-   Внимание!!! Шаг для пользователей, которые не имеют аккаунта на iq.sms или для тех, кто не хочет получать СМС о подтверждении, а лишь проверить функционал Trust Not Trust.
-   7.1 Откройте файл app/routes/auth.py
-   7.2 Спуститесь к функции get_one_time_code
-   7.3 Закоментируйте следующие строчки:
+   Attention!!! This step is for users who do not have an account on iq.sms or for those who do not want to receive SMS confirmation, but only check the functionality of Trust Not Trust.
+
+   Open file app/routes/auth.py
+   
+   Go down to the function get_one_time_code
+   
+   Comment out the following lines:
       ```python3
       utils.check_sms(phone_number, code.code, code.id)
       return JSONResponse(
@@ -63,7 +66,8 @@ To install this project, follow these steps:
         content={"message": "The code has been sent successfully"}
       )
       ```
-      И добавьте вместо них следующий код:
+      
+      And add the following code instead:
       ```python3
       return JSONResponse(
         status_code=200,
