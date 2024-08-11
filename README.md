@@ -56,10 +56,10 @@ To install this project, follow these steps:
    API_HOST=0.0.0.0
    API_PORT=5000
    ```
-(Attention! This application uses a third-party microservice to send SMS. If you do not have an account on the site https://iqsms.ru / - you will have to change part of the code for correct review [STEP 7])
+(Attention!!! This application uses a third-party microservice to send SMS. If you do not have an account on the site https://iqsms.ru / - you will have to change part of the code for correct review [STEP 7])
 
 7. Changing the code:  
-   Attention!!! This step is for users who do not have an account on iq.sms or for those who do not want to receive SMS confirmation, but only check the functionality of Trust Not Trust.
+   This step is for users who do not have an account on iq.sms or for those who do not want to receive SMS confirmation, but only check the functionality of Trust Not Trust.
    Open file app/routes/auth.py Go down to the function get_one_time_code.
    
    Comment out the following lines:  
