@@ -86,6 +86,18 @@ To install this project, follow these steps:
    ```bash
    gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 
+
+## Docker 🐳
+Before starting to launch the application using docker, make sure that docker and docker compose is installed.
+After that, use one of the following commands to run the docker-compose file:
+```bash
+   sudo docker compose up --build
+```
+or
+```bash
+   sudo docker-compose up --build
+```
+
 ## Documentation 📑
    All the functionality after launching the API will be located at the following address: http://0.0.0.0:8000/docs.
    When you create an application on FastAPI, it automatically generates OpenAPI documentation based on your routes and annotations.
