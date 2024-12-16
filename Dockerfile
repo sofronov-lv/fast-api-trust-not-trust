@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.11-alpine
 
 RUN mkdir /fastapi_trust_not_trust
 
