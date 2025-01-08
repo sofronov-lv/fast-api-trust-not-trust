@@ -6,7 +6,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
-      - app_network
+      - app-network
 
   app:
     build:
@@ -14,17 +14,16 @@ services:
     restart: always
     env_file:
       - app/core/.env
-    container_name: tnt_app
     ports:
       - 9999:8000
     depends_on:
       - db
     networks:
-      - app_network
+      - app-network
 
 volumes:
   db-data:
 
 networks:
-  app_network:
+  app-network:
     driver: bridge
